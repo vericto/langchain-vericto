@@ -1,0 +1,179 @@
+[build-system]
+requires = ["hatchling>=1.33.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "langchain-vericto"
+dynamic = ["version"]
+description = "An integration package connecting Vericto (database guardrails for AI agents) and LangChain: check every SQL statement against Vericto's rules before it runs."
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.11.0,<4.0.0"
+authors = [{ name = "Vericto", email = "security@vericto.com" }]
+keywords = ["langchain", "vericto", "sql", "guardrails", "database-guardrails", "ai-agents", "sql-agent", "text-to-sql"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Database",
+    "Topic :: Security",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Typing :: Typed",
+]
+# The Vericto SDK (Apache-2.0, urllib3 only) does the evaluation: the Runtime API
+# online, the `vericto` CLI's local engine offline (a separate process; the
+# AGPL-3.0 engine is never imported or bundled).
+dependencies = [
+    "langchain-core>=1.7.1,<2.0.0",
+    "vericto>=0.8.0,<0.9.0",
+]
+
+[project.optional-dependencies]
+# VerictoSQLDatabase wraps langchain_community.utilities.SQLDatabase.
+sql = [
+    "langchain-community>=0.3,<0.5",
+    "sqlalchemy>=1.4,<3",
+]
+
+[project.urls]
+Homepage = "https://vericto.com"
+Documentation = "https://github.com/vericto/langchain-vericto#readme"
+Repository = "https://github.com/vericto/langchain-vericto"
+Issues = "https://github.com/vericto/langchain-vericto/issues"
+Changelog = "https://github.com/vericto/langchain-vericto/blob/main/CHANGELOG.md"
+
+[dependency-groups]
+test = [
+    "pytest>=9.0.3,<10.0.0",
+    "pytest-asyncio>=1.3.0,<2.0.0",
+    "pytest-socket>=0.7.0,<1.0.0",
+    # Pinned, as the LangChain standard-tests guide recommends: a new release can
+    # add tests that break CI.
+    "langchain-tests==1.1.9",
+    "langchain-community>=0.4,<0.5",
+    "sqlalchemy>=2.0,<3",
+    # create_agent, for the agent-loop test.
+    "langchain>=1.5,<2",
+]
+test_integration = []
+lint = ["ruff>=0.17.3,<0.18.0"]
+typing = [
+    "mypy>=2.4.1,<3",
+    "langchain-community>=0.4,<0.5",
+    "sqlalchemy>=2.0,<3",
+    "pytest>=9.0.3,<10.0.0",
+    "langchain-tests==1.1.9",
+    "langchain>=1.5,<2",
+]
+dev = []
+
+[tool.uv]
+default-groups = ["test", "lint", "typing"]
+# TEMPORARY, development only (never in the published metadata): offline mode is
+# on vericto-python main (df3f11b) but not yet in a PyPI release. Delete this
+# override and run `uv lock` once vericto 0.8.0 is on PyPI; release.yml refuses
+# to publish while it is here.
+override-dependencies = [
+    "vericto @ git+https://github.com/vericto/vericto-python@df3f11b81ab77c405774c86e18453ff22c211f53",
+]
+
+[tool.hatch.version]
+path = "langchain_vericto/_version.py"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "langchain_vericto",
+    "tests",
+    "examples",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE",
+    "TRADEMARKS.md",
+    "SECURITY.md",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["langchain_vericto"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["langchain_vericto", "tests", "examples", "scripts"]
+
+[[tool.mypy.overrides]]
+# Untyped third-party test helpers.
+module = ["pytest_socket.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# BaseTool and SQLDatabase subclasses: their bases carry Any through pydantic.
+module = ["langchain_vericto.*", "tests.*", "examples.*"]
+disallow_subclassing_any = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.ruff.lint]
+select = [
+    "A",      # flake8-builtins
+    "ASYNC",  # flake8-async
+    "B",      # flake8-bugbear
+    "C4",     # flake8-comprehensions
+    "D",      # pydocstyle
+    "E",      # pycodestyle error
+    "EM",     # flake8-errmsg
+    "F",      # pyflakes
+    "FA",     # flake8-future-annotations
+    "FBT",    # flake8-boolean-trap
+    "I",      # isort
+    "PERF",   # perflint
+    "PGH",    # pygrep-hooks
+    "PIE",    # flake8-pie
+    "RET",    # flake8-return
+    "RUF",    # ruff
+    "S",      # flake8-bandit
+    "SIM",    # flake8-simplify
+    "T20",    # flake8-print
+    "TID",    # flake8-tidy-imports
+    "UP",     # pyupgrade
+    "W",      # pycodestyle warning
+]
+ignore = [
+    "RUF012",  # Doesn't play well with Pydantic
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+ignore-var-parameters = true
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = ["S101", "S603", "D", "FBT", "S608"]
+"examples/*.py" = ["T201", "S608", "INP001"]
+"scripts/*.py" = ["T201", "INP001"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --strict-config --durations=5"
+markers = [
+    "compile: mark placeholder test used to compile integration tests without running them",
+]
+asyncio_mode = "auto"
+filterwarnings = [
+    # Expected: VerictoSQLDatabase wraps langchain-community's SQLDatabase (README, "Limits").
+    "ignore:`langchain-community` is being sunset:DeprecationWarning",
+]
+asyncio_default_fixture_loop_scope = "function"
