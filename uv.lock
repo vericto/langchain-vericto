@@ -8,9 +8,6 @@ resolution-markers = [
     "python_full_version < '3.12'",
 ]
 
-[manifest]
-overrides = [{ name = "vericto", git = "https://github.com/vericto/vericto-python?rev=df3f11b81ab77c405774c86e18453ff22c211f53" }]
-
 [[package]]
 name = "aiohappyeyeballs"
 version = "2.7.1"
@@ -2399,10 +2396,14 @@ wheels = [
 
 [[package]]
 name = "vericto"
-version = "0.7.0"
-source = { git = "https://github.com/vericto/vericto-python?rev=df3f11b81ab77c405774c86e18453ff22c211f53#df3f11b81ab77c405774c86e18453ff22c211f53" }
+version = "0.8.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "urllib3" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/eb/f8/a5861603955a0dd0d616351e945b59eed56fdf5a699209df12a81357bb72/vericto-0.8.0.tar.gz", hash = "sha256:2ba7f4e92737c30da0fc27d1f22e60a826e15296a2071cae022694223af26dbd", size = 220253, upload-time = "2026-11-15T19:26:57.667Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5c/d5/0632e27f32c4a5ce47cfa85d2f08a7890e422d66886589f4c51df0ff6957/vericto-0.8.0-py3-none-any.whl", hash = "sha256:99159b738a2a765cb616fbf1f458488e02aa5577c93576849a395fb64345c784", size = 108506, upload-time = "2026-11-15T19:26:55.902Z" },
 ]
 
 [[package]]
