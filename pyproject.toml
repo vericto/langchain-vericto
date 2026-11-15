@@ -76,13 +76,6 @@ dev = []
 
 [tool.uv]
 default-groups = ["test", "lint", "typing"]
-# TEMPORARY, development only (never in the published metadata): offline mode is
-# on vericto-python main (df3f11b) but not yet in a PyPI release. Delete this
-# override and run `uv lock` once vericto 0.8.0 is on PyPI; release.yml refuses
-# to publish while it is here.
-override-dependencies = [
-    "vericto @ git+https://github.com/vericto/vericto-python@df3f11b81ab77c405774c86e18453ff22c211f53",
-]
 
 [tool.hatch.version]
 path = "langchain_vericto/_version.py"
